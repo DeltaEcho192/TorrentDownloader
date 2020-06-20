@@ -1,16 +1,17 @@
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
+import difflib
 
 #Created By DeltaEcho
 #TODO If an episode is not found print a remark and continue to the next one
 #TODO Build a basic GUI for user interface
-#TODO Run search just episode and choose one with highest seeders
 #TODO Check that file with Highest seaders has correct episode number in and Correct name
 
 
 def epListMaker():
     # TODO Adjust episode namer
+    #TODO Remember to add season and episode for checking.
     firstEp = int(input("Please enter first episodes number: "))
     lastEP = int(input("Please enter last episode: "))
     SeriesName = input("PLease input shows Name: ")
@@ -49,6 +50,7 @@ def seedSorter(seedersC):
     posSeed = seedCount.index(slctSeed)
     return posSeed
 
+
 x = 0
 while x < len(listEP):
     #name = listEP[x].replace('.',' ')
@@ -72,12 +74,18 @@ while x < len(listEP):
     print(fnlPosSeed)
     #To Open link of a torrent.
     firstC = soup.find_all("td",{'class',"coll-1 name"})
-    while i < len(firstC):
-        name1 = firstC[i].find_all("a")
-        if str(name) == str(name1[1].text):
-            link = name1[1].get('href')
+    name1 = firstC[fnlPosSeed].find_all("a")
+    nameProp = name1[1].text
+    similarity = difflib.SequenceMatcher(None, name, nameProp).ratio()
+    if nameProp.find(season) == -1 | nameProp.find(ep) == -1:
+        print("Episode or Season did not match torrent.")
+        break
+    if similarity < 0.5:
+        #TODO Cut of end of torrent name to make it easier to guage without all the facts added.
+        print("Similarity of torrent names was to low and most likely not the correct episode.")
+        break
 
-        i = i + 1
+    link = name1[1].get("href")
 
     #
     #
