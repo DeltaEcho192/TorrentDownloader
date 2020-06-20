@@ -12,17 +12,17 @@ It uses this information to then use the website 1337x.to to search and find the
 It then downloads the torrent file and continues until all episodes are downloaded.
 
 ## Requirements
-Python
-Beautiful Soup 4
-Selenium Python
-ChromeDriver
+- Python
+- Beautiful Soup 4
+- Selenium Python
+- ChromeDriver
 
 ## Instalation
-    * Download Python package from python website and follow instructions or on OSX/Linux `sudo apt-get install python`
-    * Then clone git project
-    * Go into directory and run the command `pip install -r requiremnets.txt`
-    * Then just use `python torrentDownloader.py`
-    * If you experiance a ChromeDriver error follow instructions in Extra
+- Download Python package from python website and follow instructions or on OSX/Linux `sudo apt-get install python`
+- Then clone git project
+- Go into directory and run the command `pip install -r requiremnets.txt`
+- Then just use `python torrentDownloader.py`
+- If you experiance a ChromeDriver error follow instructions in Extra
 
 ## Extras
 Selenium browser does not run in docker
