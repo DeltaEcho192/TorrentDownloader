@@ -6,6 +6,7 @@ import difflib
 #Created By DeltaEcho
 #TODO If an episode is not found print a remark and continue to the next one
 #TODO Build a basic GUI for user interface
+#TODO Run the browser but headless
 
 def epListMaker():
     SeriesName = input("PLease input shows Name: ")
