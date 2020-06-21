@@ -8,9 +8,10 @@ from selenium.webdriver.chrome.options import Options
 
 #Created By DeltaEcho
 #TODO If an episode is not found print a remark and continue to the next one
-#TODO Run the browser but headless
 
+#Function Takes input from GUI and makes sure all variables are valid for program
 def check():
+    #Use of Global variable because of Tkinter limitations on returning
     global nameG,seasonG,sEpG,eEpG
     try:
         nameG = str(nameE.get())
@@ -34,6 +35,7 @@ def check():
 
     window.destroy()
 
+#GUI Code
 window = tk.Tk()
 window.geometry("300x200")
 name = tk.Label(text="Enter Show name:")
@@ -57,7 +59,7 @@ button.pack()
 
 window.mainloop()
 
-
+#Functions uses the given inputs to create Array of the searchable episode names.
 def epListMaker():
     SeriesName = nameG
     season = seasonG
@@ -92,7 +94,8 @@ def epListMaker():
     print(listEP)
 
 
-
+#Takes the list of amount of seeds and finds the position of the torrent with the most seeds
+#Usually 1st one because default is to sort my seeds. More for redunecy
 def seedSorter(seedersC):
     c = 0
     seedCount = []
@@ -103,9 +106,11 @@ def seedSorter(seedersC):
     posSeed = seedCount.index(slctSeed)
     return posSeed
 
+#Function to do actual download of torrent as this cant be done in headless mode.
 def torrentOpener(link):
     driverOpen = webdriver.Chrome()
     driverOpen.get(link)
+    #Allows for cloudflare to proccess request and download
     time.sleep(10)
     driverOpen.close()
 
@@ -113,6 +118,7 @@ x = 0
 ep = []
 listEP,season,ep = epListMaker()
 
+#Option to make the browser to run in headless mode
 options = Options()
 options.headless = True
 
@@ -122,19 +128,23 @@ while x < len(listEP):
     driver = webdriver.Chrome(chrome_options=options)
     driver.get("https://1337x.to")
 
+    #Completes search field and clicks button
     driver.find_element_by_id("autocomplete").send_keys(name)
     driver.find_element_by_xpath('//*[@id="search-index-form"]/button').click()
 
     content = driver.page_source
     soup = BeautifulSoup(content,'html.parser')
+    #Collects all the seed numbers for the torrents
     seedersC = soup.find_all("td",{'class',"coll-2 seeds"})
     fnlPosSeed = seedSorter(seedersC)
-    print(fnlPosSeed)
     #To Open link of a torrent.
     firstC = soup.find_all("td",{'class',"coll-1 name"})
+    #Uses the seed pos to find the name and link values for torrent.
     name1 = firstC[fnlPosSeed].find_all("a")
     nameProp = name1[1].text
+    #Uses similarity to make sure that the torrent name and user input is mostly similar.
     similarity = difflib.SequenceMatcher(None, name, nameProp).ratio()
+    #Sudo makes sure torrent has the season number and episode number in the name.
     if nameProp.find(str(season)) == -1 | nameProp.find(str(ep[x])) == -1:
         print("Episode or Season did not match torrent.")
         break
@@ -147,13 +157,14 @@ while x < len(listEP):
 
     fullLink = "https://www.1337x.to" + link
     driver.get(fullLink)
+    #Opens torrent page
     pageContent = driver.page_source
     soup2 = BeautifulSoup(pageContent,'html.parser')
-
+    #Finds the link of the torrent in the dropdown menu of the website.
     torrentLink = soup2.find_all("ul",{'class',"dropdown-menu"})
     torrentHref = torrentLink[0].find("a")
     finalLink = torrentHref.get('href')
-    print(finalLink)
+    #Does actual download of file
     torrentOpener(finalLink)
     driver.close()
     x = x + 1
