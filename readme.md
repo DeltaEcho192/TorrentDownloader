@@ -1,4 +1,4 @@
-# Torrent Download
+# Torrent Downloader
 
 ## General
 This program uses a webscrapper to automatically access torrents and collect relevent files to bulk download a show.
