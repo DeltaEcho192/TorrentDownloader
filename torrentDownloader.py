@@ -7,7 +7,6 @@ import tkinter as tk
 from selenium.webdriver.chrome.options import Options
 
 #Created By DeltaEcho
-#TODO If an episode is not found print a remark and continue to the next one
 
 #Function Takes input from GUI and makes sure all variables are valid for program
 def check():
@@ -20,8 +19,8 @@ def check():
         eEpG = int(eEpE.get())
         if sEpG > eEpG:
             raise Exception("Starting episode number cant be greater then last episode")
-        if sEpG < 1 or eEpG < 1:
-            raise Exception("Cant have a episode less then 1")
+        if sEpG < 1 or eEpG < 1 or seasonG < 1:
+            raise Exception("Cant have a episode or season less then 1")
     except ValueError:
         error = tk.Toplevel()
         errorL = tk.Label(error,text="A character has been entered instead of number.")
