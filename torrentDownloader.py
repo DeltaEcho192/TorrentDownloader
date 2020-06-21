@@ -1,18 +1,68 @@
+import sys
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import difflib
+import tkinter as tk
+from selenium.webdriver.chrome.options import Options
 
 #Created By DeltaEcho
 #TODO If an episode is not found print a remark and continue to the next one
-#TODO Build a basic GUI for user interface
 #TODO Run the browser but headless
 
+def check():
+    global nameG,seasonG,sEpG,eEpG
+    try:
+        nameG = str(nameE.get())
+        seasonG = int(seasonE.get())
+        sEpG = int(sEpE.get())
+        eEpG = int(eEpE.get())
+        if sEpG > eEpG:
+            raise Exception("Starting episode number cant be greater then last episode")
+        if sEpG < 1 or eEpG < 1:
+            raise Exception("Cant have a episode less then 1")
+    except ValueError:
+        error = tk.Toplevel()
+        errorL = tk.Label(error,text="A character has been entered instead of number.")
+        errorL.pack()
+        error.mainloop()
+    except Exception as a:
+        error = tk.Toplevel()
+        errorL = tk.Label(error, text=a)
+        errorL.pack()
+        error.mainloop()
+
+    window.destroy()
+
+window = tk.Tk()
+window.geometry("300x200")
+name = tk.Label(text="Enter Show name:")
+nameE = tk.Entry(width=40)
+season = tk.Label(text="Enter Season:")
+seasonE = tk.Entry(width=20)
+sEp = tk.Label(text="Enter Start Episode:")
+sEpE = tk.Entry(width=20)
+eEp = tk.Label(text="Enter End Episode:")
+eEpE = tk.Entry(width=20)
+button = tk.Button(text="Run",command=check)
+name.pack()
+nameE.pack()
+season.pack()
+seasonE.pack()
+sEp.pack()
+sEpE.pack()
+eEp.pack()
+eEpE.pack()
+button.pack()
+
+window.mainloop()
+
+
 def epListMaker():
-    SeriesName = input("PLease input shows Name: ")
-    season = int(input("Please enter the Season: "))
-    firstEp = int(input("Please enter first episodes number: "))
-    lastEP = int(input("Please enter last episode: "))
+    SeriesName = nameG
+    season = seasonG
+    firstEp = sEpG
+    lastEP = eEpG
 
     # SeriesName+S0+Season+E0+Episode... Format of string
 
@@ -53,14 +103,23 @@ def seedSorter(seedersC):
     posSeed = seedCount.index(slctSeed)
     return posSeed
 
+def torrentOpener(link):
+    driverOpen = webdriver.Chrome()
+    driverOpen.get(link)
+    time.sleep(10)
+    driverOpen.close()
 
 x = 0
 ep = []
 listEP,season,ep = epListMaker()
+
+options = Options()
+options.headless = True
+
 while x < len(listEP):
     name = listEP[x]
     i = 0
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(chrome_options=options)
     driver.get("https://1337x.to")
 
     driver.find_element_by_id("autocomplete").send_keys(name)
@@ -76,7 +135,7 @@ while x < len(listEP):
     name1 = firstC[fnlPosSeed].find_all("a")
     nameProp = name1[1].text
     similarity = difflib.SequenceMatcher(None, name, nameProp).ratio()
-    if nameProp.find(season) == -1 | nameProp.find(ep[x]) == -1:
+    if nameProp.find(str(season)) == -1 | nameProp.find(str(ep[x])) == -1:
         print("Episode or Season did not match torrent.")
         break
     if similarity < 0.5:
@@ -95,7 +154,6 @@ while x < len(listEP):
     torrentHref = torrentLink[0].find("a")
     finalLink = torrentHref.get('href')
     print(finalLink)
-    driver.get(finalLink)
-    time.sleep(15)
+    torrentOpener(finalLink)
     driver.close()
     x = x + 1
